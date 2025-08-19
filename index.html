@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모유수유 엄마를 위한 식단 추천</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>모유수유 엄마 식단 추천 달력</h1>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <button id="prevMonth" class="close-btn" style="padding:4px 16px;font-size:14px;">◀ 이전달</button>
+            <span id="monthTitle" style="font-size:18px;font-weight:bold;color:#2d6a4f;"></span>
+            <button id="nextMonth" class="close-btn" style="padding:4px 16px;font-size:14px;">다음달 ▶</button>
+        </div>
+        <div id="calendar" class="calendar"></div>
+    </div>
+    <div id="mealPopup" class="meal-popup">
+        <h2 id="popupDate"></h2>
+        <div id="popupMeals"></div>
+        <button class="close-btn" onclick="closePopup()">닫기</button>
+    </div>
+    <script src="sikdan.js"></script>
+    <script>
+        // 월 상태 변수
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+
+        function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const startDay = firstDay.getDay();
+            const daysInMonth = lastDay.getDate();
+            // 월 타이틀
+            document.getElementById('monthTitle').innerText = `${currentYear}년 ${currentMonth+1}월`;
+            // 요일 헤더
+            const days = ['일', '월', '화', '수', '목', '금', '토'];
+            days.forEach(day => {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day';
+                dayDiv.style.fontWeight = 'bold';
+                dayDiv.style.background = '#fff';
+                dayDiv.innerText = day;
+                calendar.appendChild(dayDiv);
+            });
+            // 빈칸
+            for (let i = 0; i < startDay; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'day';
+                emptyDiv.style.background = 'transparent';
+                calendar.appendChild(emptyDiv);
+            }
+            // 날짜
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'day';
+                dateDiv.innerText = d;
+                dateDiv.onclick = function() {
+                    selectDay(this, currentYear, currentMonth, d);
+                };
+                calendar.appendChild(dateDiv);
+            }
+        }
+        function selectDay(elem, year, month, day) {
+            document.querySelectorAll('.day').forEach(e => e.classList.remove('selected'));
+            elem.classList.add('selected');
+            const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            showMealPopup(dateStr);
+        }
+        function showMealPopup(dateStr) {
+            const meal = getMeal(dateStr);
+            document.getElementById('popupDate').innerText = `${dateStr} 식단 추천`;
+            let html = '';
+            let totalCal = 0;
+            ['breakfast','lunch','dinner'].forEach(type => {
+                html += `<div class=\"meal\"><strong>${type==='breakfast'?'아침':type==='lunch'?'점심':'저녁'}</strong><br>${meal[type].menu}<br>칼로리: ${meal[type].calories}kcal</div>`;
+                totalCal += meal[type].calories;
+            });
+            html += `<div style=\"margin-top:12px;font-weight:bold;color:#2d6a4f;\">총 칼로리: ${totalCal}kcal</div>`;
+            document.getElementById('popupMeals').innerHTML = html;
+            document.getElementById('mealPopup').classList.add('active');
+        }
+        function closePopup() {
+            document.getElementById('mealPopup').classList.remove('active');
+        }
+        document.getElementById('prevMonth').onclick = function() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        };
+        document.getElementById('nextMonth').onclick = function() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        };
+        renderCalendar();
+    </script>
+</body>
+</html>
