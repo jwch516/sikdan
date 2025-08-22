@@ -101,10 +101,3 @@ function getMeal(dateStr) {
     };
 }
 
-function getMeal(dateStr) {
-    // 날짜가 없으면 랜덤 식단 추천
-    if (mealData[dateStr]) return mealData[dateStr];
-    const keys = Object.keys(mealData);
-    const randomKey = keys[Math.floor(Math.random() * keys.length)];
-    return mealData[randomKey];
-}
