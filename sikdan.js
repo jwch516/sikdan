@@ -57,7 +57,7 @@ const specialLunchMenus = [
 
 function getDayOfWeek(year, month, day) {
     // 0: 일요일, 1: 월요일 ...
-    return new Date(year, month - 1, day).getDay();
+    return new Date(year, month - 1, day).getDay(); // month는 1~12로 들어오므로 -1 필요
 }
 
 function getMeal(dateStr) {
